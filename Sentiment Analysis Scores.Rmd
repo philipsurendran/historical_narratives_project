@@ -1,0 +1,71 @@
+---
+title: "Sentiment Analysis Compound Scores"
+author: "Philip Surendran"
+date: "6/15/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(qwraps2)
+library(xtable)
+```
+
+## Mean Sentiment Scores w/ Standard Deviation
+
+
+```{r, warning=FALSE, message=FALSE, results='asis'}
+df <- read_csv("~/Documents/Research/scored_data.csv", col_names = TRUE)
+
+conservative <- c('Somewhat conservative', 'Very conservative')
+
+summary <- df %>%
+  select(contains("_score"), targetgroup)
+
+mean_sd1 <- function(x){
+  return(mean_sd(x, na_rm = TRUE, digits = 4, denote_sd = "paren", show_n = "never"))
+}
+
+summary <- summary %>% 
+  mutate(Overall = select(summary, 1:7) %>% rowSums(na.rm = TRUE)) %>% 
+  group_by(targetgroup) %>% 
+  summarise(across(1:8, mean_sd1, .names="{.col}")) 
+
+
+
+# print(summary)
+
+print(xtable(summary[1:5]), comment = F)
+print(xtable(summary[c(1,6:9)]), comment = F)
+```
+## Frequency Distributions & Bigrams - White Conservatives
+
+```{r, echo=FALSE, out.width="80%", fig.align = "center", fig.cap="White Conservative Breakdown"}
+
+knitr::include_graphics("whiteconservatives.png")
+```
+
+
+## Frequency Distributions & Bigrams - White Liberals
+
+```{r, echo=FALSE, out.width="80%", fig.align = "center", fig.cap="White Liberal Breakdown"}
+
+knitr::include_graphics("whiteliberal.png")
+```
+
+## Frequency Distributions & Bigrams - Black Conservatives
+
+```{r, echo=FALSE, out.width="80%", fig.align = "center", fig.cap="Black Conservative Breakdown"}
+
+knitr::include_graphics("blackconservative.png")
+```
+
+## Frequency Distributions & Bigrams - Black Non-Conservatives
+
+```{r, echo=FALSE, out.width="80%", fig.align = "center", fig.cap="Black Non-Conservative Breakdown"}
+
+knitr::include_graphics("blacknonconservative.png")
+```
+
+
